@@ -12,14 +12,14 @@ const totalCost=m=>(+m.eb||0)+(+m.zeon||0)+(+m.other||0);
 function renderKpis(){
  const m=latest();
  const rows=[
-  ['⚡','Total Energy Charged',num(m.energy)+' kWh','green'],
-  ['🚗','Car Sessions','1,145','blue'],
-  ['🚌','Bus Sessions','310','yellow'],
-  ['₹','Total Revenue',money(totalRevenue(m)),'red'],
-  ['↗','Total Cost',money(totalCost(m)),'purple'],
-  ['▥','Net Profit',money(m.profit),'cyan']
+  ['⚡','Total Energy Charged',num(m.energy)+' kWh','green','energy'],
+  ['▥','Net Profit',money(m.profit),'profitbig','profit'],
+  ['₹','Total Revenue',money(totalRevenue(m)),'red',''],
+  ['%','ZEON Commission',money(m.zeon),'purple',''],
+  ['🧾','TNEB Bill Payment',money((+m.tneb1||0)+(+m.tneb2||0)),'yellow',''],
+  ['👛','Other Expenses',money(m.other),'blue','']
  ];
- document.getElementById('kpis').innerHTML=rows.map(r=>`<div class="kpi"><div class="ico ${r[3]}">${r[0]}</div><div class="txt"><span>${r[1]}</span><b>${r[2]}</b><small>↑ updated monthly</small></div></div>`).join('');
+ document.getElementById('kpis').innerHTML=rows.map(r=>`<div class="kpi ${r[4]}"><div class="ico ${r[3]}">${r[0]}</div><div class="txt"><span>${r[1]}</span><b>${r[2]}</b><small>↑ updated monthly</small></div></div>`).join('');
 }
 function renderSnapshotSelect(){
  const s=document.getElementById('snapshotMonth');const old=s.value;
@@ -41,13 +41,24 @@ function renderCharts(){
 }
 function businessCols(){
  return [
-  {k:'month',l:'Month',type:'text'},{k:'energy',l:'Energy (kWh)'},{k:'carRevenue',l:'Car Rev (₹)'},{k:'busRevenue',l:'Bus Rev (₹)'},{k:'revenue',l:'Total Revenue (₹)'},{k:'eb',l:'EB Cost (₹)'},{k:'zeon',l:'ZEON (₹)'},{k:'other',l:'Other (₹)'},{k:'profit',l:'Profit (₹)'},
+  {k:'month',l:'Month',type:'text'},
+  {k:'energy',l:'Energy (kWh)'},
+  {k:'revenue',l:'Total Revenue (₹)'},
+  {k:'zeon',l:'ZEON Commission (₹)'},
+  {k:'tnebBill',l:'TNEB Bill (₹)'},
+  {k:'other',l:'Other Expenses (₹)'},
+  {k:'profit',l:'Net Profit (₹)'},
   ...(state.customColumns||[]).map(c=>({k:c.key,l:c.label,custom:true}))
  ];
 }
 function cell(row,key,i,type){
- const v=row[key]??'';
- if(!editing){if(key==='month')return v;if(key==='energy')return num(v);return money(v)}
+ let v=row[key]??'';
+ if(key==='tnebBill') v=(+row.tneb1||0)+(+row.tneb2||0);
+ if(!editing){
+   if(key==='month')return v;
+   if(key==='energy')return num(v);
+   return money(v);
+ }
  return `<input class="cell-input ${type==='text'?'text':''}" data-i="${i}" data-k="${key}" type="${type==='text'?'text':'number'}" step="any" value="${v}">`;
 }
 function renderBusiness(){
@@ -55,8 +66,14 @@ function renderBusiness(){
  document.querySelector('#businessTable thead').innerHTML='<tr>'+cols.map(c=>`<th>${c.custom?`<span class="custom-th">${c.l}<button onclick="removeCustomColumn('${c.k}')">×</button></span>`:c.l}</th>`).join('')+(editing?'<th>Action</th>':'')+'</tr>';
  document.querySelector('#businessTable tbody').innerHTML=state.monthly.map((m,i)=>'<tr>'+cols.map(c=>`<td class="editable ${c.k==='profit'?'profit':''}">${cell(m,c.k,i,c.type)}</td>`).join('')+(editing?`<td><button class="delete" onclick="deleteMonth(${i})">🗑</button></td>`:'')+'</tr>').join('');
  document.querySelectorAll('#businessTable .cell-input').forEach(el=>el.onchange=e=>{
-   const i=+e.target.dataset.i,k=e.target.dataset.k;state.monthly[i][k]=k==='month'?e.target.value:Number(e.target.value||0);
-   if(['carRevenue','busRevenue'].includes(k))state.monthly[i].revenue=(+state.monthly[i].carRevenue||0)+(+state.monthly[i].busRevenue||0);
+   const i=+e.target.dataset.i,k=e.target.dataset.k;
+   const value=k==='month'?e.target.value:Number(e.target.value||0);
+   if(k==='tnebBill'){
+     state.monthly[i].tneb1=value/2;
+     state.monthly[i].tneb2=value/2;
+   }else{
+     state.monthly[i][k]=value;
+   }
    save();renderAll(false)
  });
 }
@@ -94,8 +111,26 @@ function openModal(title,fields,vals,onSave){
  document.getElementById('modal').classList.add('open');
 }
 window.closeModal=()=>document.getElementById('modal').classList.remove('open');
-const monthFields=[{name:'month',label:'Month',type:'text'},{name:'energy',label:'Energy (kWh)'},{name:'carRevenue',label:'Car Revenue'},{name:'busRevenue',label:'Bus Revenue'},{name:'revenue',label:'Total Revenue'},{name:'eb',label:'EB Cost'},{name:'zeon',label:'ZEON Commission'},{name:'other',label:'Other Cost'},{name:'profit',label:'Profit'},{name:'gstOut',label:'GST Output'},{name:'gstIn',label:'GST Input'},{name:'tneb1',label:'TNEB Connection 1'},{name:'tneb2',label:'TNEB Connection 2'},{name:'tnebStatus',label:'TNEB Status',type:'select',options:['Paid','Pending']}];
-window.addMonth=()=>openModal('Add Month',monthFields,{tnebStatus:'Pending'},o=>{if(!o.revenue)o.revenue=(+o.carRevenue||0)+(+o.busRevenue||0);(state.customColumns||[]).forEach(c=>o[c.key]=0);state.monthly.push(o)});
+const monthFields=[
+{name:'month',label:'Month',type:'text'},
+{name:'energy',label:'Energy (kWh)'},
+{name:'revenue',label:'Total Revenue'},
+{name:'zeon',label:'ZEON Commission'},
+{name:'tnebBill',label:'TNEB Bill'},
+{name:'other',label:'Other Expenses'},
+{name:'profit',label:'Net Profit'},
+{name:'gstOut',label:'GST Output'},
+{name:'gstIn',label:'GST Input'},
+{name:'tnebStatus',label:'TNEB Status',type:'select',options:['Paid','Pending']}
+];
+window.addMonth=()=>openModal('Add Month',monthFields,{tnebStatus:'Pending'},o=>{
+ const bill=+o.tnebBill||0;
+ o.tneb1=bill/2;
+ o.tneb2=bill/2;
+ delete o.tnebBill;
+ (state.customColumns||[]).forEach(c=>o[c.key]=0);
+ state.monthly.push(o)
+});
 window.deleteMonth=i=>{if(confirm('Delete this month?')){state.monthly.splice(i,1);save();renderAll()}};
 window.clearGST=i=>{state.monthly[i].gstOut=0;state.monthly[i].gstIn=0;save();renderAll(false)};
 window.clearTNEB=i=>{state.monthly[i].tneb1=0;state.monthly[i].tneb2=0;state.monthly[i].tnebStatus='Paid';save();renderAll(false)};

@@ -1,21 +1,31 @@
-# AadhiRiya Photo Dashboard
+# AadhiRiya Final Business Dashboard
 
-This version uses your uploaded station photo as the top hero background and your Kavi Travels green electric-bus photo.
+Final monthly dashboard layout.
 
-## Included
+## Monthly Business Data fields
+- Month
+- Energy (kWh)
+- Total Revenue
+- ZEON Commission
+- TNEB Bill
+- Other Expenses
+- Net Profit
+
+## Features
+- Big Total Energy card
+- Big Net Profit card
+- Big Add Month button
 - Global Edit Mode
-- Editable Monthly Business Data
-- Editable GST tracking
-- Editable TNEB tracking
-- Editable tariffs
-- Editable expenses
-- Add month / custom column / tariff / expense
+- Editable existing months
+- Add new months
+- GST tracker
+- TNEB tracker
+- Editable tariffs and expenses
+- Custom columns
 - Excel export
-- JSON backup and import
+- JSON backup/import
 - Print / Save PDF
-- Responsive mobile layout
-- Browser localStorage persistence
+- Mobile responsive
+- Uses your station photo and Kavi Travels bus image
 
-## Publish
-Replace the files in your existing GitHub repository and push to `main`.
-If Vercel is connected, it will redeploy automatically.
+Edits are stored in the current browser using localStorage.

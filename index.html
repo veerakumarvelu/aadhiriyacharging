@@ -15,7 +15,7 @@
     <div class="side-top">⚡</div>
     <nav>
       <button class="active"><span>⌂</span><small>Dashboard</small></button>
-      <button><span>🚗</span><small>Charging<br>Sessions</small></button>
+      <button><span>📅</span><small>Monthly<br>Data</small></button>
       <button><span>🚘</span><small>Vehicles</small></button>
       <button><span>₹</span><small>Finance<br>(P&L)</small></button>
       <button><span>⚡</span><small>TNEB Bills</small></button>
@@ -63,7 +63,13 @@
       <div class="clean-energy"><span>🍃</span><b>Clean Energy</b><strong>Brighter Tomorrow</strong></div>
     </header>
 
-    <section class="kpis" id="kpis"></section>
+    <section class="kpi-lead">
+      <div class="kpis" id="kpis"></div>
+      <button class="big-add-month no-print" onclick="addMonth()">
+        <span>＋</span>
+        <div><b>ADD MONTH</b><small>Update monthly business data</small></div>
+      </button>
+    </section>
 
     <section class="analytics-grid">
       <article class="card">
