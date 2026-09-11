@@ -1,18 +1,18 @@
-# AadhiRiya Monthly Performance Dashboard
+# AadhiRiya Clean Final Dashboard
 
-Final version with:
-- Same AadhiRiya multicolor banner/logo
-- Net Profit card includes selected month
-- One combined monthly financial chart
-- Revenue
-- TNEB Bill Payment
-- ZEON Commission
-- Other Expenses
-- Net Profit line
-- Monthly selector with previous/next arrows
+This version removes the duplicated top KPI cards.
+
+Main layout:
+- Charging-station photo banner
+- One large Monthly Financial Overview chart
+- Selected-month Net Profit summary
+- Revenue by Vehicle Type donut
+- Expense Breakdown donut
+- Editable Monthly Business Data table
+- Add Month
+- Add custom column
 - Global Edit Mode
-- Editable Monthly Business, GST, TNEB, tariffs, and expenses
 - Excel export
-- JSON backup/import
-- Print/PDF
+- Backup / import
+- Print / PDF
 - Mobile responsive
