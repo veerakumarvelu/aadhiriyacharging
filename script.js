@@ -13,7 +13,7 @@ function renderKpis(){
  const m=latest();
  const rows=[
   ['⚡','Total Energy Charged',num(m.energy)+' kWh','green','energy'],
-  ['▥','Net Profit',money(m.profit),'profitbig','profit'],
+  ['▥',`Net Profit (${m.month})`,money(m.profit),'profitbig','profit'],
   ['₹','Total Revenue',money(totalRevenue(m)),'red',''],
   ['%','ZEON Commission',money(m.zeon),'purple',''],
   ['🧾','TNEB Bill Payment',money((+m.tneb1||0)+(+m.tneb2||0)),'yellow',''],
@@ -21,23 +21,80 @@ function renderKpis(){
  ];
  document.getElementById('kpis').innerHTML=rows.map(r=>`<div class="kpi ${r[4]}"><div class="ico ${r[3]}">${r[0]}</div><div class="txt"><span>${r[1]}</span><b>${r[2]}</b><small>↑ updated monthly</small></div></div>`).join('');
 }
-function renderSnapshotSelect(){
- const s=document.getElementById('snapshotMonth');const old=s.value;
+let selectedMonthIndex = Math.max(0,state.monthly.length-1);
+
+function renderPerformanceMonth(){
+ const s=document.getElementById('performanceMonth');
+ if(!s)return;
+ const current=Math.min(selectedMonthIndex,state.monthly.length-1);
  s.innerHTML=state.monthly.map((m,i)=>`<option value="${i}">${m.month}</option>`).join('');
- s.value=old && +old<state.monthly.length?old:Math.max(0,state.monthly.length-1);s.onchange=renderSnapshot;
+ s.value=current;
+ s.onchange=()=>{selectedMonthIndex=+s.value;renderPerformanceSummary();renderFinancialChart()};
+ document.getElementById('prevMonthBtn').onclick=()=>{
+   if(selectedMonthIndex>0){selectedMonthIndex--;renderPerformanceMonth();renderPerformanceSummary();renderFinancialChart();}
+ };
+ document.getElementById('nextMonthBtn').onclick=()=>{
+   if(selectedMonthIndex<state.monthly.length-1){selectedMonthIndex++;renderPerformanceMonth();renderPerformanceSummary();renderFinancialChart();}
+ };
 }
-function renderSnapshot(){
- const i=+document.getElementById('snapshotMonth').value||Math.max(0,state.monthly.length-1),m=state.monthly[i]||{};
- const gst=Math.max(0,(+m.gstOut||0)-(+m.gstIn||0));
- const rows=[['⚡ Energy (kWh)',num(m.energy)],['₹ Revenue',money(totalRevenue(m))],['↘ Total Cost',money(totalCost(m))],['▥ Net Profit',money(m.profit)],['▣ GST Payable',money(gst)],['⚡ TNEB Bills Due',m.tnebStatus==='Paid'?'₹ 0':money((+m.tneb1||0)+(+m.tneb2||0))]];
- document.getElementById('snapshot').innerHTML=rows.map(r=>`<div class="snap"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+
+function renderPerformanceSummary(){
+ const m=state.monthly[selectedMonthIndex]||latest();
+ const tneb=(+m.tneb1||0)+(+m.tneb2||0);
+ const rows=[
+   ['⚡','Energy Charged',num(m.energy)+' kWh','green'],
+   ['₹','Revenue',money(totalRevenue(m)),'red'],
+   ['%','ZEON Commission',money(m.zeon),'purple'],
+   ['🧾','TNEB Bill',money(tneb),'yellow'],
+   ['👛','Other Expenses',money(m.other),'blue'],
+   ['▥',`Net Profit (${m.month})`,money(m.profit),'profitbig']
+ ];
+ const box=document.getElementById('performanceKpis');
+ if(box)box.innerHTML=rows.map(r=>`<div class="performance-kpi ${r[3]}"><div class="pk-icon">${r[0]}</div><div><span>${r[1]}</span><b>${r[2]}</b></div></div>`).join('');
+ const title=document.getElementById('overviewTitle');
+ if(title)title.textContent=`Monthly Financial Overview (${m.month})`;
+
+ const legend=document.getElementById('financialLegend');
+ if(legend){
+   legend.innerHTML=`
+   <div><span class="dot revenue"></span><b>Total Revenue</b><strong>${money(totalRevenue(m))}</strong></div>
+   <div><span class="dot tneb"></span><b>TNEB Bill Payment</b><strong>${money(tneb)}</strong></div>
+   <div><span class="dot zeon"></span><b>ZEON Commission</b><strong>${money(m.zeon)}</strong></div>
+   <div><span class="dot other"></span><b>Other Expenses</b><strong>${money(m.other)}</strong></div>
+   <div class="profit-line"><span class="dot profit"></span><b>Net Profit (${m.month})</b><strong>${money(m.profit)}</strong></div>`;
+ }
 }
+
+function renderFinancialChart(){
+ if(charts.financial)charts.financial.destroy();
+ const labels=state.monthly.map(x=>x.month);
+ charts.financial=new Chart(document.getElementById('financialChart'),{
+   type:'bar',
+   data:{
+     labels,
+     datasets:[
+       {label:'Revenue',data:state.monthly.map(totalRevenue)},
+       {label:'TNEB Bill',data:state.monthly.map(x=>(+x.tneb1||0)+(+x.tneb2||0))},
+       {label:'ZEON Commission',data:state.monthly.map(x=>+x.zeon||0)},
+       {label:'Other Expenses',data:state.monthly.map(x=>+x.other||0)},
+       {type:'line',label:'Net Profit',data:state.monthly.map(x=>+x.profit||0),tension:.3,borderWidth:3,pointRadius:4}
+     ]
+   },
+   options:{
+     responsive:true,
+     maintainAspectRatio:false,
+     interaction:{mode:'index',intersect:false},
+     plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
+     scales:{
+       x:{grid:{display:false},ticks:{font:{size:9}}},
+       y:{beginAtZero:true,ticks:{font:{size:9},callback:v=>'₹ '+Number(v).toLocaleString('en-IN')}}
+     }
+   }
+ });
+}
+
 function renderCharts(){
- Object.values(charts).forEach(c=>c.destroy());
- const m=latest(),labels=state.monthly.map(x=>x.month);
- charts.rev=new Chart(document.getElementById('revenueChart'),{type:'doughnut',data:{labels:['Cars','Buses'],datasets:[{data:[+m.carRevenue||65,+m.busRevenue||35]}]},options:{cutout:'65%',plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:9}}}}}});
- charts.exp=new Chart(document.getElementById('expenseChart'),{type:'doughnut',data:{labels:['EB Cost','ZEON Commission','Other'],datasets:[{data:[+m.eb||0,+m.zeon||0,+m.other||0]}]},options:{cutout:'65%',plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:9}}}}}});
- charts.profit=new Chart(document.getElementById('profitChart'),{type:'bar',data:{labels,datasets:[{label:'Revenue',data:state.monthly.map(totalRevenue)},{label:'Cost',data:state.monthly.map(totalCost)},{type:'line',label:'Profit',data:state.monthly.map(x=>+x.profit||0),tension:.35}]},options:{plugins:{legend:{labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:8}}},y:{ticks:{font:{size:8}}}}}});
+ renderFinancialChart();
 }
 function businessCols(){
  return [
@@ -100,7 +157,19 @@ function renderBrands(){
 function renderExpenses(){
  document.getElementById('expenses').innerHTML=state.expenses.map((x,i)=>`<div class="expense"><b>${x.name}</b><span>${money(x.amount)} · ${x.cycle} · ${x.status}</span>${editing?`<div class="tools"><button onclick="editExpense(${i})">Edit</button><button onclick="deleteExpense(${i})">Delete</button></div>`:''}</div>`).join('');
 }
-function renderAll(chartsToo=true){renderKpis();renderSnapshotSelect();renderSnapshot();renderBusiness();renderGST();renderTNEB();renderTariffs();renderAlerts();renderBrands();renderExpenses();if(chartsToo)renderCharts()}
+function renderAll(chartsToo=true){
+ renderKpis();
+ renderPerformanceMonth();
+ renderPerformanceSummary();
+ renderBusiness();
+ renderGST();
+ renderTNEB();
+ renderTariffs();
+ renderAlerts();
+ renderBrands();
+ renderExpenses();
+ if(chartsToo)renderCharts();
+}
 window.toggleEdit=()=>{editing=!editing;document.body.classList.toggle('editing',editing);document.getElementById('editModeTop').textContent=editing?'✓ Edit Mode ON':'✎ Edit Mode';renderAll(false)};
 document.getElementById('editModeTop').onclick=toggleEdit;
 

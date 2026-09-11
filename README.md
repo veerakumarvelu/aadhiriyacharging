@@ -1,31 +1,18 @@
-# AadhiRiya Final Business Dashboard
+# AadhiRiya Monthly Performance Dashboard
 
-Final monthly dashboard layout.
-
-## Monthly Business Data fields
-- Month
-- Energy (kWh)
-- Total Revenue
+Final version with:
+- Same AadhiRiya multicolor banner/logo
+- Net Profit card includes selected month
+- One combined monthly financial chart
+- Revenue
+- TNEB Bill Payment
 - ZEON Commission
-- TNEB Bill
 - Other Expenses
-- Net Profit
-
-## Features
-- Big Total Energy card
-- Big Net Profit card
-- Big Add Month button
+- Net Profit line
+- Monthly selector with previous/next arrows
 - Global Edit Mode
-- Editable existing months
-- Add new months
-- GST tracker
-- TNEB tracker
-- Editable tariffs and expenses
-- Custom columns
+- Editable Monthly Business, GST, TNEB, tariffs, and expenses
 - Excel export
 - JSON backup/import
-- Print / Save PDF
+- Print/PDF
 - Mobile responsive
-- Uses your station photo and Kavi Travels bus image
-
-Edits are stored in the current browser using localStorage.

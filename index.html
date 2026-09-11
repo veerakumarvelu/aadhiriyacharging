@@ -71,26 +71,56 @@
       </button>
     </section>
 
-    <section class="analytics-grid">
-      <article class="card">
-        <div class="card-head"><b>Revenue by Vehicle Type</b><button class="edit-only">✎</button></div>
-        <canvas id="revenueChart"></canvas>
-      </article>
-      <article class="card">
-        <div class="card-head"><b>Expense Breakdown</b><button class="edit-only">✎</button></div>
-        <canvas id="expenseChart"></canvas>
-      </article>
-      <article class="card trend">
-        <div class="card-head"><b>Monthly Profit Trend</b><button class="edit-only">✎</button></div>
-        <canvas id="profitChart"></canvas>
-      </article>
-      <article class="card snapshot">
-        <div class="card-head"><b>Current Month Snapshot</b><select id="snapshotMonth"></select></div>
-        <div id="snapshot"></div>
-      </article>
-    </section>
+    
+<section class="monthly-performance">
+  <div class="performance-banner">
+    <div class="performance-brand">
+      <div class="mini-multi-logo">
+        <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span>
+        <span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
+      </div>
+      <div>
+        <b>Monthly Performance</b>
+        <small>AadhiRiya Charging Solutions</small>
+      </div>
+    </div>
 
-    <section class="table-grid">
+    <div class="month-nav">
+      <button id="prevMonthBtn" class="no-print">‹</button>
+      <select id="performanceMonth"></select>
+      <button id="nextMonthBtn" class="no-print">›</button>
+    </div>
+
+    <div class="performance-tag">
+      <span>🍃</span>
+      <div><b>Clean Energy</b><small>Brighter Tomorrow</small></div>
+    </div>
+  </div>
+
+  <div class="performance-kpi-row" id="performanceKpis"></div>
+
+  <article class="card financial-overview">
+    <div class="overview-head">
+      <div>
+        <span>MONTHLY FINANCIAL OVERVIEW</span>
+        <h2 id="overviewTitle">Monthly Financial Overview</h2>
+      </div>
+      <div class="overview-controls no-print">
+        <button class="active">Monthly</button>
+        <button id="overviewEditBtn" onclick="toggleEdit()">✎ Edit</button>
+      </div>
+    </div>
+
+    <div class="financial-chart-layout">
+      <div class="financial-chart-wrap">
+        <canvas id="financialChart"></canvas>
+      </div>
+      <div id="financialLegend" class="financial-legend"></div>
+    </div>
+  </article>
+</section>
+
+<section class="table-grid">
       <article class="card table-card business">
         <div class="table-title">
           <div><b>Monthly Business Data (Editable)</b><span class="edit-only">✎</span></div>

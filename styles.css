@@ -137,3 +137,100 @@ footer{display:flex;justify-content:space-between;align-items:center;background:
     min-height:100%;
   }
 }
+
+
+/* Monthly Performance - final combined analytics */
+.monthly-performance{padding:0 8px 8px}
+.performance-banner{
+  min-height:76px;
+  border-radius:12px;
+  background:linear-gradient(100deg,#08b85a,#16a0bd);
+  color:#fff;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:16px;
+  padding:12px 18px;
+  margin-bottom:8px;
+}
+.performance-brand{display:flex;align-items:center;gap:10px}
+.performance-brand>div:last-child{display:flex;flex-direction:column}
+.performance-brand b{font-size:18px}
+.performance-brand small{font-size:9px;opacity:.85}
+.mini-multi-logo{display:flex;gap:1px}
+.mini-multi-logo span{
+  width:24px;height:28px;border-radius:4px;display:grid;place-items:center;
+  font-size:15px;font-weight:900;color:white;
+}
+.month-nav{display:flex;align-items:center;gap:7px;background:#ffffff35;border-radius:999px;padding:4px}
+.month-nav button{border:0;background:transparent;color:#fff;font-size:22px;width:34px;height:34px;cursor:pointer}
+.month-nav select{
+  min-width:140px;border:0;border-radius:999px;padding:9px 14px;
+  font-weight:900;color:#123047;background:#dff8eb;text-align:center;
+}
+.performance-tag{display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.performance-tag>span{font-size:28px}
+.performance-tag>div{display:flex;flex-direction:column;align-items:flex-end}
+.performance-tag b{font-size:14px}.performance-tag small{font-size:10px}
+
+.performance-kpi-row{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px
+}
+.performance-kpi{
+  background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px;
+  display:flex;align-items:center;gap:9px;min-height:82px
+}
+.performance-kpi.profitbig{border:2px solid #31b767;background:linear-gradient(135deg,#f3fff7,#e9fff1)}
+.pk-icon{
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  color:#fff;font-size:19px;flex:0 0 auto
+}
+.performance-kpi.green .pk-icon{background:#08b85a}
+.performance-kpi.red .pk-icon{background:#ff474d}
+.performance-kpi.purple .pk-icon{background:#8c4cf4}
+.performance-kpi.yellow .pk-icon{background:#f5a623}
+.performance-kpi.blue .pk-icon{background:#1682f8}
+.performance-kpi.profitbig .pk-icon{background:#08a84e}
+.performance-kpi span{display:block;font-size:9px;color:#5f6e78;font-weight:800}
+.performance-kpi b{display:block;font-size:16px;margin-top:3px}
+.performance-kpi.profitbig b{font-size:22px;color:#07843e}
+
+.financial-overview{padding:0}
+.overview-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 14px;border-bottom:1px solid var(--line)
+}
+.overview-head span{font-size:9px;color:#0b9a52;font-weight:900;letter-spacing:.08em}
+.overview-head h2{margin:3px 0 0;font-size:18px}
+.overview-controls{display:flex;gap:6px}
+.overview-controls button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:9px;font-weight:800}
+.overview-controls button.active{background:#0db35d;color:#fff;border-color:#0db35d}
+.financial-chart-layout{
+  display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:12px;padding:12px
+}
+.financial-chart-wrap{height:330px}
+.financial-legend{
+  background:#f7fbf9;border:1px solid #e2eee7;border-radius:10px;padding:10px
+}
+.financial-legend>div{
+  display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center;
+  padding:10px 6px;border-bottom:1px solid #e7efea;font-size:9px
+}
+.financial-legend>div:last-child{border-bottom:0}
+.financial-legend strong{font-size:11px}
+.financial-legend .profit-line{margin-top:8px;padding-top:12px;border-top:2px solid #d8eadf}
+.financial-legend .profit-line strong{font-size:18px;color:#07843e}
+.dot{width:10px;height:10px;border-radius:50%;display:block}
+.dot.revenue{background:#1682f8}.dot.tneb{background:#ff5a6d}.dot.zeon{background:#8c4cf4}.dot.other{background:#f5a623}.dot.profit{background:#08a84e}
+
+@media(max-width:1180px){
+  .performance-kpi-row{grid-template-columns:repeat(3,1fr)}
+  .financial-chart-layout{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .performance-banner{grid-template-columns:1fr;gap:10px}
+  .performance-tag{justify-content:flex-start}.performance-tag>div{align-items:flex-start}
+  .performance-kpi-row{grid-template-columns:1fr 1fr}
+  .performance-kpi.profitbig{grid-column:span 2}
+  .financial-chart-wrap{height:280px}
+}
