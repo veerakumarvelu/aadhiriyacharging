@@ -3,195 +3,186 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#08171f">
 <title>AadhiRiya Charging Solutions</title>
+<meta name="theme-color" content="#ffffff">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="app-shell">
+<div class="app">
+  <aside class="sidebar no-print">
+    <div class="side-top">⚡</div>
+    <nav>
+      <button class="active"><span>⌂</span><small>Dashboard</small></button>
+      <button><span>🚗</span><small>Charging<br>Sessions</small></button>
+      <button><span>🚘</span><small>Vehicles</small></button>
+      <button><span>₹</span><small>Finance<br>(P&L)</small></button>
+      <button><span>⚡</span><small>TNEB Bills</small></button>
+      <button><span>▣</span><small>Expenses</small></button>
+      <button><span>▥</span><small>Reports</small></button>
+      <button><span>📍</span><small>Station Info</small></button>
+      <button><span>⚙</span><small>Settings</small></button>
+    </nav>
+  </aside>
 
-<aside class="sidebar no-print">
-  <div class="side-brand">⚡</div>
-  <nav>
-    <button class="nav active"><span>⌂</span><small>Dashboard</small></button>
-    <button class="nav"><span>🚗</span><small>Charging<br>Sessions</small></button>
-    <button class="nav"><span>⚙</span><small>Vehicles</small></button>
-    <button class="nav"><span>₹</span><small>Finance<br>(P&L)</small></button>
-    <button class="nav"><span>⚡</span><small>TNEB Bills</small></button>
-    <button class="nav"><span>▣</span><small>Expenses</small></button>
-    <button class="nav"><span>▥</span><small>Reports</small></button>
-    <button class="nav"><span>📍</span><small>Station Info</small></button>
-    <button class="nav"><span>⚙</span><small>Settings</small></button>
-  </nav>
-</aside>
+  <main class="main">
+    <header class="hero">
+      <img src="station-bg.png" alt="AadhiRiya charging station" class="hero-bg">
+      <div class="hero-shade"></div>
 
-<main class="main">
-
-<header class="hero">
-  <div class="hero-left">
-    <div class="logo-row">
-      <div class="letter-logo" aria-label="AadhiRiya">
-        <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span><span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
-      </div>
-      <div class="title-block">
+      <div class="brand-area">
+        <div class="multi-logo">
+          <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span><span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
+        </div>
         <h1>Charging Solutions</h1>
         <p>Drive Cleaner <i>•</i> Greener <i>•</i> Together</p>
+
+        <div class="station-cards">
+          <div><span>📍</span><b>NH544, Sankagiri</b><small>Tamil Nadu, India</small></div>
+          <div><span>◷</span><b>24/7</b><small>Charging</small></div>
+          <div><span>🔌</span><b>2 × 120 kW</b><small>Configured ~103 kW each</small></div>
+        </div>
       </div>
-    </div>
-    <div class="station-meta">
-      <div><span>📍</span><b>NH544, Sankagiri</b><small>Tamil Nadu, India</small></div>
-      <div><span>◷</span><b>24/7</b><small>Charging</small></div>
-      <div><span>🔌</span><b>2 × 120 kW</b><small>Configured ~103 kW each</small></div>
-    </div>
-  </div>
 
-  <div class="hero-center">
-    <div class="canopy">
-      <div class="canopy-sign letter-logo mini">
-        <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span><span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
+      <div class="brand-strip">
+        <div class="tata">TATA .EV</div>
+        <div class="bus-title">Kavi Travels<small>Bangalore ↔ Coimbatore</small></div>
+        <img src="kavi-bus.png" alt="Kavi Travels electric bus" class="bus-img">
       </div>
-    </div>
-    <div class="charger c1">ZEON<br><strong>⚡</strong></div>
-    <div class="charger c2">ZEON<br><strong>⚡</strong></div>
-    <div class="tata-label">TATA .EV</div>
-    <div class="car">🚙</div>
-    <div class="bus-box">
-      <div class="kavi-label">Kavi Travels<small>Bangalore ↔ Coimbatore</small></div>
-      <img src="kavi-bus.png" alt="Kavi Travels green electric bus">
-    </div>
-  </div>
 
-  <div class="hero-right">
-    <div class="user-row no-print">
-      <span>👤 Veerakumar</span>
-      <button id="editModeTop">✎ Edit Mode</button>
-      <button title="Settings">⚙</button>
-      <button title="Fullscreen">⛶</button>
-    </div>
-    <div class="date-box"><span>📅</span><div><b>11 Sep 2026</b><small>Friday · 12:30 PM</small></div></div>
-    <div class="clean"><span>🍃</span><b>Clean Energy</b><strong>Brighter Tomorrow</strong></div>
-  </div>
-</header>
+      <div class="hero-actions no-print">
+        <div class="user">👤 Veerakumar</div>
+        <button id="editModeTop">✎ Edit Mode</button>
+        <button>⚙</button>
+        <button>⛶</button>
+      </div>
 
-<section class="kpi-row" id="kpis"></section>
+      <div class="date-card"><span>📅</span><div><b>11 Sep 2026</b><small>Friday · 12:30 PM</small></div></div>
 
-<section class="analytics-grid">
-  <article class="panel donut-panel">
-    <div class="panel-title"><b>Revenue by Vehicle Type</b><button class="mini-edit edit-only">✎</button></div>
-    <canvas id="revenueChart"></canvas>
-  </article>
+      <div class="clean-energy"><span>🍃</span><b>Clean Energy</b><strong>Brighter Tomorrow</strong></div>
+    </header>
 
-  <article class="panel donut-panel">
-    <div class="panel-title"><b>Expense Breakdown</b><button class="mini-edit edit-only">✎</button></div>
-    <canvas id="expenseChart"></canvas>
-  </article>
+    <section class="kpis" id="kpis"></section>
 
-  <article class="panel trend-panel">
-    <div class="panel-title"><b>Monthly Profit Trend</b><button class="mini-edit edit-only">✎</button></div>
-    <canvas id="profitChart"></canvas>
-  </article>
+    <section class="analytics-grid">
+      <article class="card">
+        <div class="card-head"><b>Revenue by Vehicle Type</b><button class="edit-only">✎</button></div>
+        <canvas id="revenueChart"></canvas>
+      </article>
+      <article class="card">
+        <div class="card-head"><b>Expense Breakdown</b><button class="edit-only">✎</button></div>
+        <canvas id="expenseChart"></canvas>
+      </article>
+      <article class="card trend">
+        <div class="card-head"><b>Monthly Profit Trend</b><button class="edit-only">✎</button></div>
+        <canvas id="profitChart"></canvas>
+      </article>
+      <article class="card snapshot">
+        <div class="card-head"><b>Current Month Snapshot</b><select id="snapshotMonth"></select></div>
+        <div id="snapshot"></div>
+      </article>
+    </section>
 
-  <article class="panel snapshot-panel">
-    <div class="panel-title"><b>Current Month Snapshot</b><select id="snapshotMonth"></select></div>
-    <div id="snapshot"></div>
-  </article>
-</section>
+    <section class="table-grid">
+      <article class="card table-card business">
+        <div class="table-title">
+          <div><b>Monthly Business Data (Editable)</b><span class="edit-only">✎</span></div>
+          <div class="actions no-print">
+            <button onclick="addMonth()">＋ Add Month</button>
+            <button onclick="addCustomColumn()">＋ Column</button>
+            <button onclick="toggleEdit()">✎ Edit</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table id="businessTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </article>
 
-<section class="main-tables">
-  <article class="panel table-panel business">
-    <div class="table-head">
-      <div><b>Monthly Business Data (Editable)</b><span class="edit-only">✎</span></div>
-      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add Month</button><button onclick="addCustomColumn()">＋ Column</button><button onclick="toggleEdit()">✎ Edit</button></div>
-    </div>
-    <div class="table-scroll">
-      <table id="businessTable"><thead></thead><tbody></tbody></table>
-    </div>
-  </article>
+      <article class="card table-card">
+        <div class="table-title">
+          <div><b>GST Tracking (Editable)</b><span class="edit-only">✎</span></div>
+          <div class="actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
+        </div>
+        <div class="table-scroll">
+          <table id="gstTable">
+            <thead><tr><th>Month</th><th>Output GST</th><th>Input GST</th><th>Net Payable</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
 
-  <article class="panel table-panel">
-    <div class="table-head">
-      <div><b>GST Tracking (Editable)</b><span class="edit-only">✎</span></div>
-      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
-    </div>
-    <div class="table-scroll">
-      <table id="gstTable">
-        <thead><tr><th>Month</th><th>Output GST</th><th>Input GST</th><th>Net Payable</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </article>
+      <article class="card table-card">
+        <div class="table-title">
+          <div><b>TNEB Bill Tracking (Editable)</b><span class="edit-only">✎</span></div>
+          <div class="actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
+        </div>
+        <div class="table-scroll">
+          <table id="tnebTable">
+            <thead><tr><th>Month</th><th>Connection 1</th><th>Connection 2</th><th>Total</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
 
-  <article class="panel table-panel">
-    <div class="table-head">
-      <div><b>TNEB Bill Tracking (Editable)</b><span class="edit-only">✎</span></div>
-      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
-    </div>
-    <div class="table-scroll">
-      <table id="tnebTable">
-        <thead><tr><th>Month</th><th>Connection 1</th><th>Connection 2</th><th>Total</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </article>
-</section>
+    <section class="bottom-grid">
+      <article class="card tariff">
+        <div class="table-title">
+          <div><b>Tariff Details (Editable)</b><span class="edit-only">✎</span></div>
+          <div class="actions no-print"><button onclick="addTariff()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
+        </div>
+        <table id="tariffTable">
+          <thead><tr><th>Vehicle Type</th><th>Rate (₹/kWh)</th><th>Notes</th><th class="edit-only">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </article>
 
-<section class="bottom-grid">
-  <article class="panel tariff-panel">
-    <div class="table-head">
-      <div><b>Tariff Details (Editable)</b><span class="edit-only">✎</span></div>
-      <div class="table-actions no-print"><button onclick="addTariff()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
-    </div>
-    <table id="tariffTable"><thead><tr><th>Vehicle Type</th><th>Rate (₹/kWh)</th><th>Notes</th><th class="edit-only">Action</th></tr></thead><tbody></tbody></table>
-  </article>
+      <article class="card quick">
+        <div class="card-head"><b>Quick Actions</b><button class="edit-only">✎</button></div>
+        <div class="quick-grid">
+          <button class="q1" onclick="addMonth()">🚗<b>Add Charging<br>Session</b></button>
+          <button class="q2" onclick="addExpense()">🪙<b>Add Expense</b></button>
+          <button class="q3" onclick="addMonth()">🧾<b>Add TNEB Bill</b></button>
+          <button class="q4" onclick="addMonth()">▣<b>Add GST Entry</b></button>
+        </div>
+      </article>
 
-  <article class="panel quick-panel">
-    <div class="panel-title"><b>Quick Actions</b><button class="mini-edit edit-only">✎</button></div>
-    <div class="quick-actions">
-      <button onclick="addMonth()" class="q1">🚗<b>Add Charging<br>Session</b></button>
-      <button onclick="addExpense()" class="q2">🪙<b>Add Expense</b></button>
-      <button onclick="addMonth()" class="q3">🧾<b>Add TNEB Bill</b></button>
-      <button onclick="addMonth()" class="q4">▣<b>Add GST Entry</b></button>
-    </div>
-  </article>
+      <article class="card alerts">
+        <div class="card-head"><b>🔔 Upcoming & Alerts</b><button class="edit-only">✎</button></div>
+        <div id="alerts"></div>
+      </article>
 
-  <article class="panel alerts-panel">
-    <div class="panel-title"><b>🔔 Upcoming & Alerts</b><button class="mini-edit edit-only">✎</button></div>
-    <div id="alerts"></div>
-  </article>
+      <article class="card brands">
+        <div class="card-head"><b>Top Vehicle Brands</b><button class="edit-only">✎</button></div>
+        <div id="brands"></div>
+      </article>
+    </section>
 
-  <article class="panel brands-panel">
-    <div class="panel-title"><b>Top Vehicle Brands</b><button class="mini-edit edit-only">✎</button></div>
-    <div id="brands"></div>
-  </article>
-</section>
+    <section class="card expense-section">
+      <div class="table-title">
+        <div><b>Expenses & Renewals</b><span class="edit-only">✎</span></div>
+        <div class="actions no-print"><button onclick="addExpense()">＋ Add Expense</button><button onclick="toggleEdit()">✎ Edit</button></div>
+      </div>
+      <div class="expense-list" id="expenses"></div>
+    </section>
 
-<section class="panel expenses-panel">
-  <div class="table-head">
-    <div><b>Expenses & Renewals</b><span class="edit-only">✎</span></div>
-    <div class="table-actions no-print"><button onclick="addExpense()">＋ Add Expense</button><button onclick="toggleEdit()">✎ Edit</button></div>
-  </div>
-  <div id="expenses" class="expense-list"></div>
-</section>
-
-<footer>
-  <div class="footer-left"><span class="leaf">🍃</span><b>AadhiRiya</b>&nbsp; Charging Solutions <i>|</i> Drive Cleaner <i>•</i> Greener <i>•</i> Together</div>
-  <div class="footer-actions no-print">
-    <button id="excelBtn">📊 Export Excel</button>
-    <button id="pdfBtn">📄 Export PDF</button>
-    <button id="backupBtn">☁ Export Backup (JSON)</button>
-    <label class="import-btn">↥ Import Backup<input id="importInput" type="file" accept=".json"></label>
-    <button id="printBtn">🖨 Print</button>
-  </div>
-</footer>
-
-</main>
+    <footer>
+      <div class="foot-brand"><span>🍃</span><b>AadhiRiya</b> Charging Solutions <i>|</i> Drive Cleaner <i>•</i> Greener <i>•</i> Together</div>
+      <div class="foot-actions no-print">
+        <button id="excelBtn">📊 Export Excel</button>
+        <button id="pdfBtn">📄 Export PDF</button>
+        <button id="backupBtn">☁ Export Backup (JSON)</button>
+        <label class="import">↥ Import Backup<input type="file" id="importInput" accept=".json"></label>
+        <button id="printBtn">🖨 Print</button>
+      </div>
+    </footer>
+  </main>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-card">
-    <div class="modal-header"><h3 id="modalTitle">Edit</h3><button onclick="closeModal()">×</button></div>
+    <div class="modal-head"><h3 id="modalTitle">Edit</h3><button onclick="closeModal()">×</button></div>
     <form id="modalForm"></form>
   </div>
 </div>
