@@ -1,25 +1,30 @@
-# AadhiRiya Business Dashboard
+# AadhiRiya Final Dashboard
 
-## What this version includes
-- Monthly EV income, EB cost, ZEON commission and recorded profit
-- Cumulative profit
-- GST output / input / indicative payable tracker
-- TNEB / EB bill payment status
-- Recurring expense tracker
-- Alerts for unpaid bills and mismatches
-- Responsive layout for phone and desktop
+This is the coded version matching the finalized dashboard layout.
 
-## Important security rule
-Do NOT store portal passwords in this repository.
-Do NOT add passwords to index.html, script.js, data.js, or GitHub.
+## Features
+- AadhiRiya multicolor branding
+- Dark EV-station hero banner
+- Tata .EV + Kavi Travels green electric bus
+- KPI cards
+- Revenue / Expense donut charts
+- Monthly Profit chart
+- Global Edit Mode
+- Editable Monthly Business Data
+- Editable GST
+- Editable TNEB
+- Editable tariffs
+- Editable expenses
+- Add new month
+- Add custom columns
+- Delete months, tariffs, expenses
+- Export Excel
+- Export JSON backup
+- Import JSON backup
+- Print / Save as PDF
+- Responsive mobile layout
 
-## ZEON live sync
-The dashboard is ready for a secure integration, but live sync should use a supported ZEON API/export endpoint.
-If ZEON provides an API token or documented export endpoint, add a server-side backend and keep secrets in server-only environment variables.
+## Data storage
+Edits are saved in browser localStorage on the device/browser used.
 
-## Deploy
-Replace the files in your existing GitHub repository, commit, and push.
-Vercel will automatically redeploy the same public URL if it is connected to the repository.
-
-## Data source
-The initial values in data.js were created from the two Excel files provided in the chat.
+For cross-device public persistence, connect the same dashboard to a database such as Supabase.

@@ -3,92 +3,198 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="AadhiRiya Charging Solutions business dashboard">
-<title>AadhiRiya Business Dashboard</title>
+<meta name="theme-color" content="#08171f">
+<title>AadhiRiya Charging Solutions</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <div class="wrap nav">
-    <div class="brand"><div class="bolt">⚡</div><div><b>AadhiRiya</b><span>Business Dashboard</span></div></div>
-    <div class="sync-pill"><span></span> Data loaded from your billing sheets</div>
+<div class="app-shell">
+
+<aside class="sidebar no-print">
+  <div class="side-brand">⚡</div>
+  <nav>
+    <button class="nav active"><span>⌂</span><small>Dashboard</small></button>
+    <button class="nav"><span>🚗</span><small>Charging<br>Sessions</small></button>
+    <button class="nav"><span>⚙</span><small>Vehicles</small></button>
+    <button class="nav"><span>₹</span><small>Finance<br>(P&L)</small></button>
+    <button class="nav"><span>⚡</span><small>TNEB Bills</small></button>
+    <button class="nav"><span>▣</span><small>Expenses</small></button>
+    <button class="nav"><span>▥</span><small>Reports</small></button>
+    <button class="nav"><span>📍</span><small>Station Info</small></button>
+    <button class="nav"><span>⚙</span><small>Settings</small></button>
+  </nav>
+</aside>
+
+<main class="main">
+
+<header class="hero">
+  <div class="hero-left">
+    <div class="logo-row">
+      <div class="letter-logo" aria-label="AadhiRiya">
+        <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span><span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
+      </div>
+      <div class="title-block">
+        <h1>Charging Solutions</h1>
+        <p>Drive Cleaner <i>•</i> Greener <i>•</i> Together</p>
+      </div>
+    </div>
+    <div class="station-meta">
+      <div><span>📍</span><b>NH544, Sankagiri</b><small>Tamil Nadu, India</small></div>
+      <div><span>◷</span><b>24/7</b><small>Charging</small></div>
+      <div><span>🔌</span><b>2 × 120 kW</b><small>Configured ~103 kW each</small></div>
+    </div>
+  </div>
+
+  <div class="hero-center">
+    <div class="canopy">
+      <div class="canopy-sign letter-logo mini">
+        <span class="y">A</span><span class="r">a</span><span class="b">d</span><span class="g">h</span><span class="y">i</span><span class="r">R</span><span class="g">i</span><span class="b">y</span><span class="b">a</span>
+      </div>
+    </div>
+    <div class="charger c1">ZEON<br><strong>⚡</strong></div>
+    <div class="charger c2">ZEON<br><strong>⚡</strong></div>
+    <div class="tata-label">TATA .EV</div>
+    <div class="car">🚙</div>
+    <div class="bus-box">
+      <div class="kavi-label">Kavi Travels<small>Bangalore ↔ Coimbatore</small></div>
+      <img src="kavi-bus.png" alt="Kavi Travels green electric bus">
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="user-row no-print">
+      <span>👤 Veerakumar</span>
+      <button id="editModeTop">✎ Edit Mode</button>
+      <button title="Settings">⚙</button>
+      <button title="Fullscreen">⛶</button>
+    </div>
+    <div class="date-box"><span>📅</span><div><b>11 Sep 2026</b><small>Friday · 12:30 PM</small></div></div>
+    <div class="clean"><span>🍃</span><b>Clean Energy</b><strong>Brighter Tomorrow</strong></div>
   </div>
 </header>
 
-<main class="wrap">
-  <section class="hero">
-    <div>
-      <div class="eyebrow">EV CHARGING • FINANCE CONTROL</div>
-      <h1>Profit, GST and TNEB in one place.</h1>
-      <p>Track revenue, recorded profit, GST position, electricity bills and operating costs for your charging station.</p>
-    </div>
-    <div class="hero-note">
-      <b>ZEON live sync</b>
-      <p>Prepared for secure integration. Login credentials are never stored in browser code or GitHub.</p>
-      <button id="syncBtn">Check sync status</button>
-    </div>
-  </section>
+<section class="kpi-row" id="kpis"></section>
 
-  <section class="kpis" id="kpis"></section>
+<section class="analytics-grid">
+  <article class="panel donut-panel">
+    <div class="panel-title"><b>Revenue by Vehicle Type</b><button class="mini-edit edit-only">✎</button></div>
+    <canvas id="revenueChart"></canvas>
+  </article>
 
-  <section class="grid2">
-    <div class="panel">
-      <div class="panel-head"><div><span>MONTHLY PERFORMANCE</span><h2>Profit & Loss</h2></div><select id="monthSelect"></select></div>
-      <div class="pnl-grid" id="monthDetails"></div>
-      <div class="bar-wrap"><div class="bar-label"><span>Recorded operating margin</span><b id="marginText"></b></div><div class="bar"><i id="marginBar"></i></div></div>
-    </div>
+  <article class="panel donut-panel">
+    <div class="panel-title"><b>Expense Breakdown</b><button class="mini-edit edit-only">✎</button></div>
+    <canvas id="expenseChart"></canvas>
+  </article>
 
-    <div class="panel">
-      <div class="panel-head"><div><span>TAX TRACKER</span><h2>GST Position</h2></div></div>
-      <div class="gst-box">
-        <div><span>GST Output</span><strong id="gstOut">—</strong></div>
-        <div><span>Available Input / ITC</span><strong id="gstIn">—</strong></div>
-        <div class="net"><span>Indicative GST payable</span><strong id="gstNet">—</strong></div>
-      </div>
-      <p class="footnote">Tracker only. Final GST liability and eligible ITC should be confirmed with your auditor before filing/payment.</p>
-    </div>
-  </section>
+  <article class="panel trend-panel">
+    <div class="panel-title"><b>Monthly Profit Trend</b><button class="mini-edit edit-only">✎</button></div>
+    <canvas id="profitChart"></canvas>
+  </article>
 
-  <section class="panel">
-    <div class="panel-head">
-      <div><span>ELECTRICITY</span><h2>TNEB / EB Bill Tracker</h2></div>
-      <div class="status-filter"><button class="active" data-filter="all">All</button><button data-filter="unpaid">Unpaid</button></div>
+  <article class="panel snapshot-panel">
+    <div class="panel-title"><b>Current Month Snapshot</b><select id="snapshotMonth"></select></div>
+    <div id="snapshot"></div>
+  </article>
+</section>
+
+<section class="main-tables">
+  <article class="panel table-panel business">
+    <div class="table-head">
+      <div><b>Monthly Business Data (Editable)</b><span class="edit-only">✎</span></div>
+      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add Month</button><button onclick="addCustomColumn()">＋ Column</button><button onclick="toggleEdit()">✎ Edit</button></div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Month</th><th>Total Bill</th><th>Veerakumar</th><th>Saranya</th><th>Fixed</th><th>Units</th><th>Status</th></tr></thead>
-        <tbody id="ebTable"></tbody>
+    <div class="table-scroll">
+      <table id="businessTable"><thead></thead><tbody></tbody></table>
+    </div>
+  </article>
+
+  <article class="panel table-panel">
+    <div class="table-head">
+      <div><b>GST Tracking (Editable)</b><span class="edit-only">✎</span></div>
+      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
+    </div>
+    <div class="table-scroll">
+      <table id="gstTable">
+        <thead><tr><th>Month</th><th>Output GST</th><th>Input GST</th><th>Net Payable</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
+        <tbody></tbody>
       </table>
     </div>
-  </section>
+  </article>
 
-  <section class="grid2 lower">
-    <div class="panel">
-      <div class="panel-head"><div><span>GST / PAYMENT ALERTS</span><h2>Action Items</h2></div></div>
-      <div id="alerts" class="alerts"></div>
+  <article class="panel table-panel">
+    <div class="table-head">
+      <div><b>TNEB Bill Tracking (Editable)</b><span class="edit-only">✎</span></div>
+      <div class="table-actions no-print"><button onclick="addMonth()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
     </div>
-    <div class="panel">
-      <div class="panel-head"><div><span>RECURRING COSTS</span><h2>Expenses & Renewals</h2></div></div>
-      <div id="expenses" class="expenses"></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head"><div><span>HISTORY</span><h2>Monthly P&L</h2></div></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Month</th><th>EV Income</th><th>EB Cost</th><th>ZEON Commission</th><th>Recorded Profit</th><th>Cumulative</th><th>Units</th></tr></thead>
-        <tbody id="pnlTable"></tbody>
+    <div class="table-scroll">
+      <table id="tnebTable">
+        <thead><tr><th>Month</th><th>Connection 1</th><th>Connection 2</th><th>Total</th><th>Status</th><th class="edit-only">Action</th></tr></thead>
+        <tbody></tbody>
       </table>
     </div>
-  </section>
+  </article>
+</section>
 
-  <section class="security">
-    <b>Security:</b> Do not put ZEON, TNEB, GST portal, bank, or email passwords in <code>index.html</code>, <code>script.js</code>, GitHub, or Vercel public environment variables. Use server-only secrets.
-  </section>
+<section class="bottom-grid">
+  <article class="panel tariff-panel">
+    <div class="table-head">
+      <div><b>Tariff Details (Editable)</b><span class="edit-only">✎</span></div>
+      <div class="table-actions no-print"><button onclick="addTariff()">＋ Add</button><button onclick="toggleEdit()">✎ Edit</button></div>
+    </div>
+    <table id="tariffTable"><thead><tr><th>Vehicle Type</th><th>Rate (₹/kWh)</th><th>Notes</th><th class="edit-only">Action</th></tr></thead><tbody></tbody></table>
+  </article>
+
+  <article class="panel quick-panel">
+    <div class="panel-title"><b>Quick Actions</b><button class="mini-edit edit-only">✎</button></div>
+    <div class="quick-actions">
+      <button onclick="addMonth()" class="q1">🚗<b>Add Charging<br>Session</b></button>
+      <button onclick="addExpense()" class="q2">🪙<b>Add Expense</b></button>
+      <button onclick="addMonth()" class="q3">🧾<b>Add TNEB Bill</b></button>
+      <button onclick="addMonth()" class="q4">▣<b>Add GST Entry</b></button>
+    </div>
+  </article>
+
+  <article class="panel alerts-panel">
+    <div class="panel-title"><b>🔔 Upcoming & Alerts</b><button class="mini-edit edit-only">✎</button></div>
+    <div id="alerts"></div>
+  </article>
+
+  <article class="panel brands-panel">
+    <div class="panel-title"><b>Top Vehicle Brands</b><button class="mini-edit edit-only">✎</button></div>
+    <div id="brands"></div>
+  </article>
+</section>
+
+<section class="panel expenses-panel">
+  <div class="table-head">
+    <div><b>Expenses & Renewals</b><span class="edit-only">✎</span></div>
+    <div class="table-actions no-print"><button onclick="addExpense()">＋ Add Expense</button><button onclick="toggleEdit()">✎ Edit</button></div>
+  </div>
+  <div id="expenses" class="expense-list"></div>
+</section>
+
+<footer>
+  <div class="footer-left"><span class="leaf">🍃</span><b>AadhiRiya</b>&nbsp; Charging Solutions <i>|</i> Drive Cleaner <i>•</i> Greener <i>•</i> Together</div>
+  <div class="footer-actions no-print">
+    <button id="excelBtn">📊 Export Excel</button>
+    <button id="pdfBtn">📄 Export PDF</button>
+    <button id="backupBtn">☁ Export Backup (JSON)</button>
+    <label class="import-btn">↥ Import Backup<input id="importInput" type="file" accept=".json"></label>
+    <button id="printBtn">🖨 Print</button>
+  </div>
+</footer>
+
 </main>
+</div>
 
-<footer><div class="wrap">AadhiRiya Charging Solutions • Finance Dashboard</div></footer>
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="modalTitle">Edit</h3><button onclick="closeModal()">×</button></div>
+    <form id="modalForm"></form>
+  </div>
+</div>
 
 <script src="data.js"></script>
 <script src="script.js"></script>
