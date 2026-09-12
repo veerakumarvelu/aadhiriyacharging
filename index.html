@@ -4,120 +4,133 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AadhiRiya Charging Solutions</title>
-<meta name="theme-color" content="#f6f9fb">
+<meta name="theme-color" content="#f4f8fb">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar no-print">
-    <div class="side-logo">⌂</div>
-    <nav>
-      <button class="active"><span>⌂</span><small>Dashboard</small></button>
-      <button><span>📅</span><small>Monthly Data</small></button>
-      <button><span>◉</span><small>Expenses</small></button>
-      <button><span>▥</span><small>Reports</small></button>
-      <button><span>▣</span><small>GST</small></button>
-      <button><span>⚡</span><small>TNEB Bills</small></button>
-      <button><span>₹</span><small>Tariff</small></button>
-      <button><span>⚙</span><small>Settings</small></button>
-    </nav>
-  </aside>
+<aside class="sidebar no-print">
+  <div class="brand-mini">⚡</div>
+  <nav>
+    <a href="#dashboard" class="active"><span>⌂</span><small>Dashboard</small></a>
+    <a href="#monthly"><span>📅</span><small>Monthly Data</small></a>
+    <a href="#documents"><span>◉</span><small>Expenses</small></a>
+    <a href="#reports"><span>▥</span><small>Reports</small></a>
+    <a href="#documents"><span>▣</span><small>GST</small></a>
+    <a href="#documents"><span>⚡</span><small>TNEB Bills</small></a>
+    <a href="#documents"><span>🧾</span><small>ZEON Invoice & Payment</small></a>
+    <a href="#settings"><span>⚙</span><small>Settings</small></a>
+  </nav>
+</aside>
 
-  <main class="main">
-    <header class="hero">
-      <img src="station-bg.png" class="hero-bg" alt="Charging station">
-      <div class="hero-overlay"></div>
-
-      <div class="brand">
-        <div class="logo-letters">
-          <span class="c1">A</span><span class="c2">a</span><span class="c3">d</span><span class="c4">h</span>
-          <span class="c1">i</span><span class="c2">R</span><span class="c4">i</span><span class="c3">y</span><span class="c3">a</span>
-        </div>
-        <h1>Charging Solutions</h1>
-        <p>Drive Cleaner <i>•</i> Greener <i>•</i> Together</p>
-      </div>
-
-      <div class="hero-info">
-        <div><span>📍</span><b>NH544, Sankagiri</b><small>Tamil Nadu, India</small></div>
-        <div><span>📅</span><b id="heroMonth">Aug 2026</b><small>Monthly Performance</small></div>
-      </div>
-
-      <div class="hero-user no-print">
-        <span>👤 Veerakumar</span>
-        <button id="editModeBtn">✎ Edit Mode</button>
-      </div>
-
-      <div class="hero-logos">
-        <b>TATA .EV</b><i>|</i><b>ZEON</b>
-      </div>
-
-      <div class="clean"><span>🍃</span><b>Clean Energy</b><strong>Brighter Tomorrow</strong></div>
-    </header>
-
-    
-<section class="final-summary">
-  <div class="summary-toolbar">
-    <div class="month-picker"><span>📅</span><select id="monthSelect"></select></div>
-    <div class="summary-nav no-print"><button id="prevMonth">‹</button><button id="nextMonth">›</button><b>▥ Monthly Overview</b></div>
+<main class="main" id="dashboard">
+<header class="top">
+  <div class="logo-wrap">
+    <div class="logo-letters">
+      <span class="c1">A</span><span class="c2">a</span><span class="c3">d</span><span class="c4">h</span><span class="c1">i</span><span class="c2">R</span><span class="c4">i</span><span class="c3">y</span><span class="c3">a</span>
+    </div>
+    <div class="company">Charging Solutions</div>
   </div>
-  <div class="one-line-kpis" id="oneLineKpis"></div>
+  <div class="tagline">🍃 <b>Drive Cleaner</b> · Greener · Together</div>
+  <div class="top-meta">
+    <div>📍 <b>NH544, Sankagiri</b><small>Tamil Nadu, India</small></div>
+    <div>📅 <select id="monthSelect"></select></div>
+    <div>👤 Veerakumar</div>
+  </div>
+</header>
+
+<section class="summary-strip">
+  <div class="profit-feature">
+    <div class="round green">▥</div>
+    <div><span id="profitMonth">Net Profit</span><small>↑ monthly result</small><b id="profitValue">₹ 0</b></div>
+  </div>
+  <div class="metric"><div class="round yellow">⚡</div><div><span>Energy Charged</span><b id="energyValue">0 kWh</b></div></div>
+  <div class="metric"><div class="round red">₹</div><div><span>Total Revenue</span><b id="revenueValue">₹ 0</b></div></div>
+  <div class="metric"><div class="round purple">%</div><div><span>ZEON Commission</span><b id="zeonValue">₹ 0</b></div></div>
+  <div class="metric"><div class="round orange">▤</div><div><span>TNEB Bill Payment</span><b id="tnebValue">₹ 0</b></div></div>
+  <div class="metric"><div class="round blue">▣</div><div><span>GST</span><b id="gstValue">₹ 0</b></div></div>
 </section>
 
-<section class="final-charts">
-  <article class="card chart-card">
+
+<section class="main-grid single-chart">
+  <article class="card overview">
     <div class="card-head">
-      <div><span>MONTHLY FINANCIAL OVERVIEW</span><h2>Revenue, Expenses and Net Profit Trend</h2></div>
-      <select id="rangeSelect" class="no-print"><option value="6">Last 6 Months</option><option value="12">Last 12 Months</option></select>
+      <div><h2>Monthly Financial Overview</h2><p>Revenue, TNEB, ZEON Commission, GST and Net Profit Trend</p></div>
+      <select id="rangeSelect"><option value="6">Last 6 Months</option><option value="12">Last 12 Months</option></select>
     </div>
     <div class="chart-wrap"><canvas id="financialChart"></canvas></div>
   </article>
-  
 </section>
 
-<section class="lower-grid">
-      <article class="card donut-card">
-        <div class="card-head small">
-          <div><h3 id="vehicleTitle">Revenue by Vehicle Type</h3></div>
-        </div>
-        <div class="donut-wrap"><canvas id="vehicleChart"></canvas></div>
-        <div id="vehicleLegend" class="donut-legend"></div>
-      </article>
+<section class="expense-modern-row">
+  <article class="card expense-card modern-expense">
+    <div class="card-head">
+      <div><h3 id="expenseTitle">Expense Breakdown</h3><p>TNEB, ZEON Commission and GST</p></div>
+    </div>
+    <div class="modern-donut-layout">
+      <div class="donut-wrap"><canvas id="expenseChart"></canvas></div>
+      <div id="expenseLegend" class="legend-list modern-legend"></div>
+    </div>
+  </article>
+</section>
 
-      <article class="card donut-card">
-        <div class="card-head small">
-          <div><h3 id="expenseTitle">Expense Breakdown</h3></div>
-        </div>
-        <div class="donut-wrap"><canvas id="expenseChart"></canvas></div>
-        <div id="expenseLegend" class="donut-legend"></div>
-      </article>
-
-      <article class="card business-card">
-        <div class="table-head">
-          <div><span>MONTHLY BUSINESS DATA</span><h3>Editable monthly records</h3></div>
-          <div class="table-actions no-print">
-            <button onclick="addMonth()">＋ Add Month</button>
-            <button onclick="addColumn()">＋ Column</button>
-          </div>
-        </div>
-        <div class="table-scroll">
-          <table id="businessTable"><thead></thead><tbody></tbody></table>
-        </div>
-      </article>
-    </section>
-
-    <footer>
-      <div class="footer-brand"><span>🍃</span><b>AadhiRiya</b>&nbsp; Charging Solutions <i>|</i> Drive Cleaner <i>•</i> Greener <i>•</i> Together</div>
-      <div class="footer-actions no-print">
-        <button id="excelBtn">📊 Export Excel</button>
-        <button id="pdfBtn">📄 Export PDF</button>
-        <button id="backupBtn">☁ Export Backup</button>
-        <label class="import-btn">↥ Import Backup<input id="importInput" type="file" accept=".json"></label>
-        <button id="printBtn">🖨 Print</button>
+<section class="lower-grid full-business">
+  <article class="card table-card" id="monthly">
+    <div class="table-head">
+      <div><h3>Monthly Business Data</h3><small>Editable monthly records</small></div>
+      <div class="actions no-print">
+        <button onclick="addMonth()">＋ Add Month</button>
+        <button onclick="toggleEdit()">✎ Edit</button>
       </div>
-    </footer>
-  </main>
+    </div>
+    <div class="table-scroll">
+      <table id="businessTable">
+        <thead><tr><th>Month</th><th>Energy (kWh)</th><th>Revenue (₹)</th><th>TNEB Bill (₹)</th><th>ZEON Comm. (₹)</th><th>GST (₹)</th><th>Net Profit (₹)</th><th class="edit-only">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+<section class="documents card" id="documents">
+  <div class="doc-head">
+    <div><h3>Documents</h3><p>Upload and manage your invoices and bills</p></div>
+    <div class="doc-controls no-print">
+      <input id="docSearch" placeholder="Search files...">
+      <button onclick="document.getElementById('docUpload').click()">⬆ Upload File</button>
+      <input id="docUpload" type="file" multiple hidden>
+    </div>
+  </div>
+
+  <div class="doc-tabs no-print">
+    <button class="active" data-cat="All">All</button>
+    <button data-cat="Expenses">Expenses</button>
+    <button data-cat="Reports">Reports</button>
+    <button data-cat="GST">GST</button>
+    <button data-cat="TNEB Bills">TNEB Bills</button>
+    <button data-cat="ZEON Invoice & Payment">ZEON Invoice & Payment</button>
+  </div>
+
+  
+<div class="doc-list-wrap">
+  <div class="doc-list-head">
+    <span>File</span><span>Category</span><span>Uploaded</span><span>Size</span><span>Actions</span>
+  </div>
+  <div id="docList" class="doc-list"></div>
+</div>
+</section>
+
+<footer id="settings">
+  <div>🍃 <b>AadhiRiya</b> Charging Solutions &nbsp; | &nbsp; Drive Cleaner · Greener · Together</div>
+  <div class="footer-actions no-print">
+    <button id="excelBtn">📊 Export Excel</button>
+    <button id="pdfBtn">📄 Export PDF</button>
+    <button id="printBtn">🖨 Print</button>
+  </div>
+</footer>
+</main>
 </div>
 
 <div class="modal" id="modal">

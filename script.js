@@ -1,152 +1,209 @@
 
-const KEY='aadhiriya_clean_final_v1';
+const KEY='aadhiriya_perfect_dashboard_v1';
 let state=JSON.parse(localStorage.getItem(KEY)||'null')||structuredClone(window.INITIAL_DATA);
-let editing=false, charts={};
+let editing=false,charts={},activeDocCategory='All';
 const money=v=>'₹ '+Number(v||0).toLocaleString('en-IN',{maximumFractionDigits:0});
 const num=v=>Number(v||0).toLocaleString('en-IN',{maximumFractionDigits:1});
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
 
-function allCols(){
- return [
-   {k:'month',l:'Month',type:'text'},
-   {k:'energy',l:'Energy (kWh)'},
-   {k:'revenue',l:'Revenue (₹)'},
-   {k:'tneb',l:'TNEB Bill (₹)'},
-   {k:'zeon',l:'ZEON Comm. (₹)'},
-   {k:'other',l:'Other Exp. (₹)'},
-   {k:'profit',l:'Net Profit (₹)'},
-   ...(state.customColumns||[]).map(c=>({k:c.key,l:c.label,custom:true}))
- ];
-}
-
+function selected(){const i=+document.getElementById('monthSelect').value||Math.max(0,state.monthly.length-1);return state.monthly[i]||{}}
 function renderMonthSelect(){
- const s=document.getElementById('monthSelect');
- const old=s.value;
+ const s=document.getElementById('monthSelect'),old=s.value;
  s.innerHTML=state.monthly.map((m,i)=>`<option value="${i}">${m.month}</option>`).join('');
- s.value=old && +old<state.monthly.length?old:Math.max(0,state.monthly.length-1);
+ s.value=old&&+old<state.monthly.length?old:Math.max(0,state.monthly.length-1);
  s.onchange=()=>{renderSummary();renderDonuts()};
 }
-function selected(){
- const i=+document.getElementById('monthSelect').value||Math.max(0,state.monthly.length-1);
- return state.monthly[i]||{};
-}
-
-function renderOneLineKpis(){
- const m=selected();
- const prevIndex=Math.max(0,(+document.getElementById('monthSelect').value||0)-1);
- const prev=state.monthly[prevIndex]||m;
- const change=(+prev.profit||0)?Math.round(((+m.profit||0)-(+prev.profit||0))/(+prev.profit||0)*100):0;
- const items=[
-   {cls:'profit-main',icon:'▥',label:`Net Profit (${m.month})`,value:money(m.profit),sub:`${change>=0?'↑':'↓'} ${Math.abs(change)}% vs last month`},
-   {cls:'energy-mini',icon:'⚡',label:'Energy Charged',value:num(m.energy)+' kWh'},
-   {cls:'revenue-mini',icon:'₹',label:'Total Revenue',value:money(m.revenue)},
-   {cls:'zeon-mini',icon:'%',label:'ZEON Commission',value:money(m.zeon)},
-   {cls:'tneb-mini',icon:'▤',label:'TNEB Bill Payment',value:money(m.tneb)},
-   {cls:'other-mini',icon:'▣',label:'Other Expenses',value:money(m.other)}
- ];
- document.getElementById('oneLineKpis').innerHTML=items.map(x=>`<div class="line-kpi ${x.cls}"><div class="line-icon">${x.icon}</div><div><span>${x.label}</span>${x.sub?`<small>${x.sub}</small>`:''}<b>${x.value}</b></div></div>`).join('');
- document.getElementById('heroMonth').textContent=m.month;
-}
-
 function renderSummary(){
- renderOneLineKpis();
+ const m=selected();
+ document.getElementById('profitMonth').textContent=`Net Profit (${m.month})`;
+ document.getElementById('profitValue').textContent=money(m.profit);
+ document.getElementById('energyValue').textContent=num(m.energy)+' kWh';
+ document.getElementById('revenueValue').textContent=money(m.revenue);
+ document.getElementById('zeonValue').textContent=money(m.zeon);
+ document.getElementById('tnebValue').textContent=money(m.tneb);
+ document.getElementById('gstValue').textContent=money(m.gst);
 }
-function renderFinancialChart(){
+function renderFinancial(){
  if(charts.financial)charts.financial.destroy();
  const months=state.monthly.slice(-(+document.getElementById('rangeSelect').value||6));
  charts.financial=new Chart(document.getElementById('financialChart'),{
   type:'bar',
   data:{labels:months.map(x=>x.month),datasets:[
    {label:'Total Revenue',data:months.map(x=>x.revenue)},
-   {label:'TNEB Bill',data:months.map(x=>x.tneb)},
+   {label:'TNEB Bill Payment',data:months.map(x=>x.tneb)},
    {label:'ZEON Commission',data:months.map(x=>x.zeon)},
-   {label:'Other Expenses',data:months.map(x=>x.other)},
+   {label:'GST',data:months.map(x=>x.gst)},
    {type:'line',label:'Net Profit',data:months.map(x=>x.profit),tension:.3,borderWidth:3,pointRadius:4}
   ]},
-  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:9},callback:v=>'₹ '+Number(v).toLocaleString('en-IN')}}}}
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('en-IN')}}}}
  });
 }
 function renderDonuts(){
  const m=selected();
- document.getElementById('vehicleTitle').textContent=`Revenue by Vehicle Type (${m.month})`;
  document.getElementById('expenseTitle').textContent=`Expense Breakdown (${m.month})`;
- if(charts.vehicle)charts.vehicle.destroy();
  if(charts.expense)charts.expense.destroy();
 
- const cars=Math.round((+m.revenue||0)*(state.vehicleMix.cars/100));
- const buses=(+m.revenue||0)-cars;
- charts.vehicle=new Chart(document.getElementById('vehicleChart'),{
-  type:'doughnut',
-  data:{labels:['Cars','Buses'],datasets:[{data:[cars,buses]}]},
-  options:{cutout:'64%',plugins:{legend:{display:false}}}
- });
- document.getElementById('vehicleLegend').innerHTML=
-  `<div class="legend-row"><i class="legend-dot" style="background:#1688f8"></i><span>Cars</span><b>${money(cars)} (${state.vehicleMix.cars}%)</b></div>
-   <div class="legend-row"><i class="legend-dot" style="background:#ff5369"></i><span>Buses</span><b>${money(buses)} (${state.vehicleMix.buses}%)</b></div>`;
+ const vals=[+m.tneb||0,+m.zeon||0,+m.gst||0];
+ const total=vals.reduce((a,b)=>a+b,0);
+ const pct=v=>total?Math.round(v/total*100):0;
+
+ const centerTextPlugin={
+   id:'centerText',
+   afterDraw(chart){
+     const {ctx,chartArea:{left,right,top,bottom}}=chart;
+     ctx.save();
+     ctx.textAlign='center';
+     ctx.fillStyle='#102334';
+     ctx.font='700 18px Segoe UI';
+     ctx.fillText(money(total),(left+right)/2,(top+bottom)/2-3);
+     ctx.fillStyle='#6f7d89';
+     ctx.font='10px Segoe UI';
+     ctx.fillText('Total Outflow',(left+right)/2,(top+bottom)/2+15);
+     ctx.restore();
+   }
+ };
 
  charts.expense=new Chart(document.getElementById('expenseChart'),{
-  type:'doughnut',
-  data:{labels:['TNEB Bill','ZEON Commission','Other Expenses'],datasets:[{data:[m.tneb,m.zeon,m.other]}]},
-  options:{cutout:'64%',plugins:{legend:{display:false}}}
+   type:'doughnut',
+   data:{
+     labels:['TNEB Bill','ZEON Commission','GST'],
+     datasets:[{
+       data:vals,
+       backgroundColor:['#ff5b68','#8d42ee','#ffb21a'],
+       borderColor:'#ffffff',
+       borderWidth:4,
+       hoverOffset:10,
+       borderRadius:5
+     }]
+   },
+   plugins:[centerTextPlugin],
+   options:{
+     cutout:'68%',
+     responsive:true,
+     maintainAspectRatio:false,
+     plugins:{
+       legend:{display:false},
+       tooltip:{
+         callbacks:{
+           label:(ctx)=>`${ctx.label}: ${money(ctx.raw)} (${pct(ctx.raw)}%)`
+         }
+       }
+     }
+   }
  });
- const total=(+m.tneb||0)+(+m.zeon||0)+(+m.other||0);
- const pct=v=>total?Math.round(v/total*100):0;
- document.getElementById('expenseLegend').innerHTML=
-  `<div class="legend-row"><i class="legend-dot" style="background:#ff5369"></i><span>TNEB Bill</span><b>${money(m.tneb)} (${pct(+m.tneb||0)}%)</b></div>
-   <div class="legend-row"><i class="legend-dot" style="background:#8c4cf4"></i><span>ZEON Commission</span><b>${money(m.zeon)} (${pct(+m.zeon||0)}%)</b></div>
-   <div class="legend-row"><i class="legend-dot" style="background:#ffad18"></i><span>Other Expenses</span><b>${money(m.other)} (${pct(+m.other||0)}%)</b></div>`;
-}
-function displayCell(m,c,i){
- let v=m[c.k]??'';
- if(!editing){
-   if(c.k==='month')return v;
-   if(c.k==='energy')return num(v);
-   return money(v);
- }
- return `<input class="cell-input ${c.type==='text'?'text':''}" data-i="${i}" data-k="${c.k}" type="${c.type==='text'?'text':'number'}" step="any" value="${v}">`;
+
+ document.getElementById('expenseLegend').innerHTML=`
+ <div class="modern-legend-row"><i style="background:#ff5b68"></i><div><span>TNEB Bill Payment</span><small>${pct(vals[0])}% of outflow</small></div><b>${money(vals[0])}</b></div>
+ <div class="modern-legend-row"><i style="background:#8d42ee"></i><div><span>ZEON Commission</span><small>${pct(vals[1])}% of outflow</small></div><b>${money(vals[1])}</b></div>
+ <div class="modern-legend-row"><i style="background:#ffb21a"></i><div><span>GST</span><small>${pct(vals[2])}% of outflow</small></div><b>${money(vals[2])}</b></div>`;
 }
 function renderTable(){
- const cols=allCols();
- document.querySelector('#businessTable thead').innerHTML='<tr>'+cols.map(c=>`<th>${c.custom?`<span class="custom-head">${c.l}<button onclick="removeColumn('${c.k}')">×</button></span>`:c.l}</th>`).join('')+(editing?'<th>Action</th>':'')+'</tr>';
- document.querySelector('#businessTable tbody').innerHTML=state.monthly.map((m,i)=>'<tr>'+cols.map(c=>`<td class="editable ${c.k==='profit'?'profit':''}">${displayCell(m,c,i)}</td>`).join('')+(editing?`<td><button class="delete" onclick="deleteMonth(${i})">Delete</button></td>`:'')+'</tr>').join('');
+ document.querySelector('#businessTable tbody').innerHTML=state.monthly.map((m,i)=>`<tr>
+ <td class="editable">${editing?`<input class="cell-input text" data-i="${i}" data-k="month" value="${m.month}">`:m.month}</td>
+ <td class="editable">${editing?`<input class="cell-input" data-i="${i}" data-k="energy" value="${m.energy}">`:num(m.energy)}</td>
+ <td class="editable">${editing?`<input class="cell-input" data-i="${i}" data-k="revenue" value="${m.revenue}">`:money(m.revenue)}</td>
+ <td class="editable">${editing?`<input class="cell-input" data-i="${i}" data-k="tneb" value="${m.tneb}">`:money(m.tneb)}</td>
+ <td class="editable">${editing?`<input class="cell-input" data-i="${i}" data-k="zeon" value="${m.zeon}">`:money(m.zeon)}</td>
+ <td class="editable">${editing?`<input class="cell-input" data-i="${i}" data-k="gst" value="${m.gst}">`:money(m.gst)}</td>
+ <td class="editable profit">${editing?`<input class="cell-input" data-i="${i}" data-k="profit" value="${m.profit}">`:money(m.profit)}</td>
+ <td class="edit-only">${editing?`<button class="delete" onclick="deleteMonth(${i})">Delete</button>`:''}</td></tr>`).join('');
  document.querySelectorAll('.cell-input').forEach(el=>el.onchange=e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;state.monthly[i][k]=k==='month'?e.target.value:Number(e.target.value||0);save();renderAll(false)});
 }
-function renderAll(chartsToo=true){renderMonthSelect();renderSummary();renderTable();if(chartsToo){renderFinancialChart();renderDonuts()}}
+function renderAll(chartsToo=true){renderMonthSelect();renderSummary();renderTable();if(chartsToo){renderFinancial();renderDonuts()}}
 
-window.toggleEdit=()=>{editing=!editing;document.body.classList.toggle('editing',editing);document.getElementById('editModeBtn').textContent=editing?'✓ Edit Mode ON':'✎ Edit Mode';renderAll(false)};
-document.getElementById('editModeBtn').onclick=toggleEdit;
-document.getElementById('rangeSelect').onchange=renderFinancialChart;
-document.getElementById('prevMonth').onclick=()=>{const s=document.getElementById('monthSelect');if(+s.value>0){s.value=+s.value-1;renderSummary();renderDonuts();}};
-document.getElementById('nextMonth').onclick=()=>{const s=document.getElementById('monthSelect');if(+s.value<state.monthly.length-1){s.value=+s.value+1;renderSummary();renderDonuts();}};
+window.toggleEdit=()=>{editing=!editing;document.body.classList.toggle('editing',editing);renderTable()};
+document.getElementById('rangeSelect').onchange=renderFinancial;
 
 function openModal(title,fields,values,onSave){
- document.getElementById('modalTitle').textContent=title;
- const f=document.getElementById('modalForm');
+ document.getElementById('modalTitle').textContent=title;const f=document.getElementById('modalForm');
  f.innerHTML=`<div class="form-grid">${fields.map(x=>`<div class="field"><label>${x.label}</label><input name="${x.name}" type="${x.type||'number'}" step="any" value="${values[x.name]??''}"></div>`).join('')}<div class="form-actions"><button type="button" onclick="closeModal()">Cancel</button><button class="save">Save</button></div></div>`;
  f.onsubmit=e=>{e.preventDefault();const fd=new FormData(f),o={};fields.forEach(x=>o[x.name]=x.type==='text'?fd.get(x.name):Number(fd.get(x.name)||0));onSave(o);save();closeModal();renderAll()};
  document.getElementById('modal').classList.add('open');
 }
 window.closeModal=()=>document.getElementById('modal').classList.remove('open');
-
-const monthFields=[
- {name:'month',label:'Month',type:'text'},
- {name:'energy',label:'Energy (kWh)'},
- {name:'revenue',label:'Total Revenue'},
- {name:'tneb',label:'TNEB Bill'},
- {name:'zeon',label:'ZEON Commission'},
- {name:'other',label:'Other Expenses'},
- {name:'profit',label:'Net Profit'}
-];
-window.addMonth=()=>openModal('Add Month',monthFields,{},o=>{(state.customColumns||[]).forEach(c=>o[c.key]=0);state.monthly.push(o)});
+const fields=[{name:'month',label:'Month',type:'text'},{name:'energy',label:'Energy (kWh)'},{name:'revenue',label:'Revenue'},{name:'tneb',label:'TNEB Bill'},{name:'zeon',label:'ZEON Commission'},{name:'gst',label:'GST'},{name:'profit',label:'Net Profit'}];
+window.addMonth=()=>openModal('Add Month',fields,{},o=>state.monthly.push(o));
 window.deleteMonth=i=>{if(confirm('Delete this month?')){state.monthly.splice(i,1);save();renderAll()}};
-window.addColumn=()=>openModal('Add Column',[{name:'label',label:'Column Name',type:'text'}],{},o=>{const key='custom_'+Date.now();state.customColumns.push({key,label:o.label||'New Column'});state.monthly.forEach(m=>m[key]=0)});
-window.removeColumn=key=>{if(confirm('Remove this column?')){state.customColumns=state.customColumns.filter(c=>c.key!==key);state.monthly.forEach(m=>delete m[key]);save();renderAll(false)}};
 
-function download(content,name,type){const b=new Blob([content],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-document.getElementById('backupBtn').onclick=()=>download(JSON.stringify(state,null,2),'aadhiriya-dashboard-backup.json','application/json');
-document.getElementById('importInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);save();renderAll();alert('Backup imported successfully.')}catch{alert('Invalid backup file.')}};r.readAsText(f)};
+/* Document vault */
+const DB='AadhiRiyaDocs',STORE='docs';let dbPromise=null;
+function openDB(){if(dbPromise)return dbPromise;dbPromise=new Promise((res,rej)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(STORE)){const s=db.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});s.createIndex('category','category',{unique:false})}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});return dbPromise}
+async function addDocs(files,category='Expenses'){const db=await openDB(),tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);for(const f of files)s.add({name:f.name,category,size:f.size,type:f.type||'application/octet-stream',date:new Date().toISOString(),blob:f});await new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});renderDocs()}
+async function getDocs(){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
+async function getDoc(id){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(STORE,'readonly').objectStore(STORE).get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function downloadDoc(id){
+ try{
+   const d=await getDoc(id);
+   if(!d||!d.blob){alert('File could not be found in browser storage.');return}
+   const blob=d.blob instanceof Blob?d.blob:new Blob([d.blob],{type:d.type||'application/octet-stream'});
+   const url=URL.createObjectURL(blob);
+   const a=document.createElement('a');
+   a.href=url;
+   a.download=d.name||'download';
+   a.style.display='none';
+   document.body.appendChild(a);
+   a.click();
+   setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
+ }catch(err){
+   console.error(err);
+   alert('Download failed. Please try again in the same browser where the file was uploaded.');
+ }
+}
+async function deleteDoc(id){
+ if(!confirm('Delete this saved file?'))return;
+ try{
+   const db=await openDB();
+   await new Promise((res,rej)=>{
+     const tx=db.transaction(STORE,'readwrite');
+     tx.objectStore(STORE).delete(id);
+     tx.oncomplete=res;
+     tx.onerror=()=>rej(tx.error);
+   });
+   await renderDocs();
+ }catch(err){
+   console.error(err);
+   alert('Delete failed. Please refresh the page and try again.');
+ }
+});renderDocs()}
+window.downloadDoc=downloadDoc;window.deleteDoc=deleteDoc;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function sizeLabel(n){return n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB'}
+async function renderDocs(){
+ const all=await getDocs();
+ const q=(document.getElementById('docSearch').value||'').toLowerCase();
+ const filtered=all
+   .filter(d=>(activeDocCategory==='All'||d.category===activeDocCategory)&&d.name.toLowerCase().includes(q))
+   .sort((a,b)=>b.date.localeCompare(a.date));
+
+ const box=document.getElementById('docList');
+ if(!filtered.length){
+   box.innerHTML='<div class="doc-empty-card">No files saved yet. Use Upload File to add an invoice or bill.</div>';
+   return;
+ }
+
+ box.innerHTML=filtered.map((d,i)=>`<div class="doc-file-row">
+   <div class="doc-file-name"><span class="file-icon">📄</span><div><b>${escapeHtml(d.name)}</b><small>File #${i+1}</small></div></div>
+   <div class="doc-category">${escapeHtml(d.category)}</div>
+   <div class="doc-date">${new Date(d.date).toLocaleDateString()}</div>
+   <div class="doc-size">${sizeLabel(d.size)}</div>
+   <div class="doc-action-buttons">
+     <button type="button" class="download-btn" data-download="${d.id}">⬇ Download</button>
+     <button type="button" class="delete-btn" data-delete="${d.id}">🗑 Delete</button>
+   </div>
+ </div>`).join('');
+
+ box.querySelectorAll('[data-download]').forEach(btn=>{
+   btn.addEventListener('click',()=>downloadDoc(Number(btn.dataset.download)));
+ });
+ box.querySelectorAll('[data-delete]').forEach(btn=>{
+   btn.addEventListener('click',()=>deleteDoc(Number(btn.dataset.delete)));
+ });
+}
+document.getElementById('docUpload').onchange=e=>{if(e.target.files.length)addDocs(e.target.files,activeDocCategory==='All'?'Expenses':activeDocCategory);e.target.value=''};
+document.getElementById('docSearch').oninput=renderDocs;
+document.querySelectorAll('.doc-tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.doc-tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeDocCategory=b.dataset.cat;renderDocs()});
+
 document.getElementById('excelBtn').onclick=()=>{const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.monthly),'Monthly Business');XLSX.writeFile(wb,'aadhiriya-monthly-business.xlsx')};
-document.getElementById('pdfBtn').onclick=()=>window.print();
-document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('pdfBtn').onclick=()=>window.print();document.getElementById('printBtn').onclick=()=>window.print();
 
-renderAll();
+renderAll();renderDocs();
