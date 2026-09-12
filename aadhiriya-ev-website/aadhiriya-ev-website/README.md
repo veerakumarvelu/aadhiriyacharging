@@ -1,22 +1,12 @@
-# AadhiRiya Charging Solutions Website
+# AadhiRiya Perfect Dashboard v2
 
-This is a static, publish-ready starter website.
-
-## Files
-- index.html
-- styles.css
-- script.js
-
-## Before publishing
-1. Replace the placeholder phone number in `index.html`.
-2. Replace the Google Maps link with your exact station listing.
-3. Confirm the public charging tariff.
-4. Add your real logo/photos if desired.
-5. Later, connect ZEON session data to the analytics section.
-
-## Easiest publishing options
-- Netlify: drag this folder into Netlify Drop.
-- Vercel: import the folder/repository.
-- GitHub Pages: upload the files to a public repository and enable Pages.
-
-No build step is required for this first version.
+Changes:
+- Removed Revenue by Vehicle Type completely
+- Keeps the same charging-station background photo
+- Financial overview is full width
+- Modern Expense Breakdown doughnut chart
+- Monthly Business Data is full width
+- Document Download and Delete actions are always visible
+- Download/Delete use explicit event listeners and IndexedDB
+- Tariff and Settings are navigation-only (no upload sections)
+- Top summary uses GST instead of Other Expenses
