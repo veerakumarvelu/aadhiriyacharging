@@ -40,62 +40,15 @@ function renderFinancial(){
 }
 function renderDonuts(){
  const m=selected();
+ document.getElementById('vehicleTitle').textContent=`Revenue by Vehicle Type (${m.month})`;
  document.getElementById('expenseTitle').textContent=`Expense Breakdown (${m.month})`;
- if(charts.expense)charts.expense.destroy();
-
- const vals=[+m.tneb||0,+m.zeon||0,+m.gst||0];
- const total=vals.reduce((a,b)=>a+b,0);
- const pct=v=>total?Math.round(v/total*100):0;
-
- const centerTextPlugin={
-   id:'centerText',
-   afterDraw(chart){
-     const {ctx,chartArea:{left,right,top,bottom}}=chart;
-     ctx.save();
-     ctx.textAlign='center';
-     ctx.fillStyle='#102334';
-     ctx.font='700 18px Segoe UI';
-     ctx.fillText(money(total),(left+right)/2,(top+bottom)/2-3);
-     ctx.fillStyle='#6f7d89';
-     ctx.font='10px Segoe UI';
-     ctx.fillText('Total Outflow',(left+right)/2,(top+bottom)/2+15);
-     ctx.restore();
-   }
- };
-
- charts.expense=new Chart(document.getElementById('expenseChart'),{
-   type:'doughnut',
-   data:{
-     labels:['TNEB Bill','ZEON Commission','GST'],
-     datasets:[{
-       data:vals,
-       backgroundColor:['#ff5b68','#8d42ee','#ffb21a'],
-       borderColor:'#ffffff',
-       borderWidth:4,
-       hoverOffset:10,
-       borderRadius:5
-     }]
-   },
-   plugins:[centerTextPlugin],
-   options:{
-     cutout:'68%',
-     responsive:true,
-     maintainAspectRatio:false,
-     plugins:{
-       legend:{display:false},
-       tooltip:{
-         callbacks:{
-           label:(ctx)=>`${ctx.label}: ${money(ctx.raw)} (${pct(ctx.raw)}%)`
-         }
-       }
-     }
-   }
- });
-
- document.getElementById('expenseLegend').innerHTML=`
- <div class="modern-legend-row"><i style="background:#ff5b68"></i><div><span>TNEB Bill Payment</span><small>${pct(vals[0])}% of outflow</small></div><b>${money(vals[0])}</b></div>
- <div class="modern-legend-row"><i style="background:#8d42ee"></i><div><span>ZEON Commission</span><small>${pct(vals[1])}% of outflow</small></div><b>${money(vals[1])}</b></div>
- <div class="modern-legend-row"><i style="background:#ffb21a"></i><div><span>GST</span><small>${pct(vals[2])}% of outflow</small></div><b>${money(vals[2])}</b></div>`;
+ if(charts.vehicle)charts.vehicle.destroy();if(charts.expense)charts.expense.destroy();
+ const cars=Math.round(m.revenue*state.vehicleMix.cars/100),buses=m.revenue-cars;
+ charts.vehicle=new Chart(document.getElementById('vehicleChart'),{type:'doughnut',data:{labels:['Cars','Buses'],datasets:[{data:[cars,buses]}]},options:{cutout:'62%',plugins:{legend:{display:false}}}});
+ document.getElementById('vehicleLegend').innerHTML=`<div class="legend-row"><i class="legend-dot" style="background:#1688f8"></i><span>Cars</span><b>${money(cars)} (${state.vehicleMix.cars}%)</b></div><div class="legend-row"><i class="legend-dot" style="background:#ff5468"></i><span>Buses</span><b>${money(buses)} (${state.vehicleMix.buses}%)</b></div>`;
+ charts.expense=new Chart(document.getElementById('expenseChart'),{type:'doughnut',data:{labels:['TNEB Bill','ZEON Commission','GST'],datasets:[{data:[m.tneb,m.zeon,m.gst]}]},options:{cutout:'62%',plugins:{legend:{display:false}}}});
+ const tot=(+m.tneb||0)+(+m.zeon||0)+(+m.gst||0),pct=v=>tot?Math.round(v/tot*100):0;
+ document.getElementById('expenseLegend').innerHTML=`<div class="legend-row"><i class="legend-dot" style="background:#ff5468"></i><span>TNEB Bill</span><b>${money(m.tneb)} (${pct(m.tneb)}%)</b></div><div class="legend-row"><i class="legend-dot" style="background:#8d42ee"></i><span>ZEON Commission</span><b>${money(m.zeon)} (${pct(m.zeon)}%)</b></div><div class="legend-row"><i class="legend-dot" style="background:#ffb21a"></i><span>GST</span><b>${money(m.gst)} (${pct(m.gst)}%)</b></div>`;
 }
 function renderTable(){
  document.querySelector('#businessTable tbody').innerHTML=state.monthly.map((m,i)=>`<tr>
@@ -131,73 +84,14 @@ function openDB(){if(dbPromise)return dbPromise;dbPromise=new Promise((res,rej)=
 async function addDocs(files,category='Expenses'){const db=await openDB(),tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);for(const f of files)s.add({name:f.name,category,size:f.size,type:f.type||'application/octet-stream',date:new Date().toISOString(),blob:f});await new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});renderDocs()}
 async function getDocs(){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
 async function getDoc(id){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(STORE,'readonly').objectStore(STORE).get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-async function downloadDoc(id){
- try{
-   const d=await getDoc(id);
-   if(!d||!d.blob){alert('File could not be found in browser storage.');return}
-   const blob=d.blob instanceof Blob?d.blob:new Blob([d.blob],{type:d.type||'application/octet-stream'});
-   const url=URL.createObjectURL(blob);
-   const a=document.createElement('a');
-   a.href=url;
-   a.download=d.name||'download';
-   a.style.display='none';
-   document.body.appendChild(a);
-   a.click();
-   setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
- }catch(err){
-   console.error(err);
-   alert('Download failed. Please try again in the same browser where the file was uploaded.');
- }
-}
-async function deleteDoc(id){
- if(!confirm('Delete this saved file?'))return;
- try{
-   const db=await openDB();
-   await new Promise((res,rej)=>{
-     const tx=db.transaction(STORE,'readwrite');
-     tx.objectStore(STORE).delete(id);
-     tx.oncomplete=res;
-     tx.onerror=()=>rej(tx.error);
-   });
-   await renderDocs();
- }catch(err){
-   console.error(err);
-   alert('Delete failed. Please refresh the page and try again.');
- }
-});renderDocs()}
+async function downloadDoc(id){const d=await getDoc(id);if(!d)return;const u=URL.createObjectURL(d.blob),a=document.createElement('a');a.href=u;a.download=d.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+async function deleteDoc(id){if(!confirm('Delete this file?'))return;const db=await openDB();await new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});renderDocs()}
 window.downloadDoc=downloadDoc;window.deleteDoc=deleteDoc;
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function sizeLabel(n){return n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB'}
 async function renderDocs(){
- const all=await getDocs();
- const q=(document.getElementById('docSearch').value||'').toLowerCase();
- const filtered=all
-   .filter(d=>(activeDocCategory==='All'||d.category===activeDocCategory)&&d.name.toLowerCase().includes(q))
-   .sort((a,b)=>b.date.localeCompare(a.date));
-
- const box=document.getElementById('docList');
- if(!filtered.length){
-   box.innerHTML='<div class="doc-empty-card">No files saved yet. Use Upload File to add an invoice or bill.</div>';
-   return;
- }
-
- box.innerHTML=filtered.map((d,i)=>`<div class="doc-file-row">
-   <div class="doc-file-name"><span class="file-icon">📄</span><div><b>${escapeHtml(d.name)}</b><small>File #${i+1}</small></div></div>
-   <div class="doc-category">${escapeHtml(d.category)}</div>
-   <div class="doc-date">${new Date(d.date).toLocaleDateString()}</div>
-   <div class="doc-size">${sizeLabel(d.size)}</div>
-   <div class="doc-action-buttons">
-     <button type="button" class="download-btn" data-download="${d.id}">⬇ Download</button>
-     <button type="button" class="delete-btn" data-delete="${d.id}">🗑 Delete</button>
-   </div>
- </div>`).join('');
-
- box.querySelectorAll('[data-download]').forEach(btn=>{
-   btn.addEventListener('click',()=>downloadDoc(Number(btn.dataset.download)));
- });
- box.querySelectorAll('[data-delete]').forEach(btn=>{
-   btn.addEventListener('click',()=>deleteDoc(Number(btn.dataset.delete)));
- });
+ const all=await getDocs(),q=(document.getElementById('docSearch').value||'').toLowerCase();
+ const filtered=all.filter(d=>(activeDocCategory==='All'||d.category===activeDocCategory)&&d.name.toLowerCase().includes(q));
+ document.querySelector('#docTable tbody').innerHTML=filtered.length?filtered.map((d,i)=>`<tr><td>${i+1}</td><td>📄 ${d.name}</td><td>${d.category}</td><td>${new Date(d.date).toLocaleDateString()}</td><td>${sizeLabel(d.size)}</td><td><div class="doc-action"><button class="download" onclick="downloadDoc(${d.id})">Download</button><button class="delete" onclick="deleteDoc(${d.id})">Delete</button></div></td></tr>`).join(''):`<tr><td colspan="6" class="doc-empty">No files saved yet.</td></tr>`;
 }
 document.getElementById('docUpload').onchange=e=>{if(e.target.files.length)addDocs(e.target.files,activeDocCategory==='All'?'Expenses':activeDocCategory);e.target.value=''};
 document.getElementById('docSearch').oninput=renderDocs;

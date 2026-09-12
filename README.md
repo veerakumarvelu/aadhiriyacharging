@@ -1,12 +1,14 @@
-# AadhiRiya Perfect Dashboard v2
+# AadhiRiya Perfect Dashboard
 
-Changes:
-- Removed Revenue by Vehicle Type completely
-- Keeps the same charging-station background photo
-- Financial overview is full width
-- Modern Expense Breakdown doughnut chart
-- Monthly Business Data is full width
-- Document Download and Delete actions are always visible
-- Download/Delete use explicit event listeners and IndexedDB
-- Tariff and Settings are navigation-only (no upload sections)
-- Top summary uses GST instead of Other Expenses
+Changes in this version:
+- Full-width Monthly Business Data table
+- Removed Tariff upload
+- Removed Settings upload
+- Top KPI changed from Other Expenses to GST
+- Modern vehicle revenue donut
+- Modern expense donut
+- Documents section supports upload, search, download and delete
+- ZEON Invoice & Payment available as its own document category
+- Download/Delete fixed using IndexedDB
+- Add Month/Edit Monthly Business Data
+- Excel export and Print/PDF

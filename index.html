@@ -53,30 +53,29 @@
   <div class="metric"><div class="round blue">▣</div><div><span>GST</span><b id="gstValue">₹ 0</b></div></div>
 </section>
 
-
-<section class="main-grid single-chart">
+<section class="main-grid">
   <article class="card overview">
     <div class="card-head">
-      <div><h2>Monthly Financial Overview</h2><p>Revenue, TNEB, ZEON Commission, GST and Net Profit Trend</p></div>
+      <div><h2>Monthly Financial Overview</h2><p>Revenue, Expenses and Net Profit Trend</p></div>
       <select id="rangeSelect"><option value="6">Last 6 Months</option><option value="12">Last 12 Months</option></select>
     </div>
     <div class="chart-wrap"><canvas id="financialChart"></canvas></div>
   </article>
-</section>
 
-<section class="expense-modern-row">
-  <article class="card expense-card modern-expense">
-    <div class="card-head">
-      <div><h3 id="expenseTitle">Expense Breakdown</h3><p>TNEB, ZEON Commission and GST</p></div>
-    </div>
-    <div class="modern-donut-layout">
-      <div class="donut-wrap"><canvas id="expenseChart"></canvas></div>
-      <div id="expenseLegend" class="legend-list modern-legend"></div>
-    </div>
+  <article class="card vehicle-card">
+    <div class="card-head"><h3 id="vehicleTitle">Revenue by Vehicle Type</h3></div>
+    <div class="donut-wrap"><canvas id="vehicleChart"></canvas></div>
+    <div id="vehicleLegend" class="legend-list"></div>
   </article>
 </section>
 
-<section class="lower-grid full-business">
+<section class="lower-grid">
+  <article class="card expense-card">
+    <div class="card-head"><h3 id="expenseTitle">Expense Breakdown</h3></div>
+    <div class="donut-wrap"><canvas id="expenseChart"></canvas></div>
+    <div id="expenseLegend" class="legend-list"></div>
+  </article>
+
   <article class="card table-card" id="monthly">
     <div class="table-head">
       <div><h3>Monthly Business Data</h3><small>Editable monthly records</small></div>
@@ -113,13 +112,12 @@
     <button data-cat="ZEON Invoice & Payment">ZEON Invoice & Payment</button>
   </div>
 
-  
-<div class="doc-list-wrap">
-  <div class="doc-list-head">
-    <span>File</span><span>Category</span><span>Uploaded</span><span>Size</span><span>Actions</span>
+  <div class="table-scroll">
+    <table id="docTable">
+      <thead><tr><th>#</th><th>File Name</th><th>Category</th><th>Uploaded On</th><th>Size</th><th>Actions</th></tr></thead>
+      <tbody></tbody>
+    </table>
   </div>
-  <div id="docList" class="doc-list"></div>
-</div>
 </section>
 
 <footer id="settings">
